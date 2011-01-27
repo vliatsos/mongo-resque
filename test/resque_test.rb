@@ -253,7 +253,9 @@ context "Resque" do
   end
 
   test "decode bad json" do
-    assert_nil Resque.decode("{\"error\":\"Module not found \\u002\"}")
+    assert_raises Resque::Helpers::DecodeException do
+      Resque.decode("{\"error\":\"Module not found \\u002\"}")
+    end
   end
 
   test "unique jobs are unique" do  
