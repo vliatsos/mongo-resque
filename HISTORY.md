@@ -1,3 +1,7 @@
+## 1.13.0 (2011-02-07)
+
+* Bugfix: worker pruning
+
 ## 1.12.0 (2011-02-03)
 
 * Added pidfile writing from `rake resque:work`
