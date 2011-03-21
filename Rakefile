@@ -1,7 +1,8 @@
 #
 # Setup
 #
-require 'rake/testtask'
+
+load 'tasks/resque.rake'
 
 $LOAD_PATH.unshift 'lib'
 require 'resque/tasks'
@@ -15,13 +16,22 @@ end
 # Tests
 #
 
+require 'rake/testtask'
+
 task :default => :test
 
-desc "Run the test suite"
-task :test do
-  rg = command?(:rg)
-  Dir['test/**/*_test.rb'].each do |f|
-    ruby(f)
+
+if command?(:rg)
+  desc "Run the test suite with rg"
+  task :test do
+    Dir['test/**/*_test.rb'].each do |f|
+      sh("rg #{f}")
+    end
+  end
+else
+  Rake::TestTask.new do |test|
+    test.libs << "test"
+    test.test_files = FileList['test/**/*_test.rb']
   end
 end
 
