@@ -9,7 +9,7 @@ context "Resque" do
     Resque.push(:people, { 'name' => 'bob' })
     Resque.push(:people, { 'name' => 'mark' })
   end
-  
+
   test "can set a namespace through a url-like string" do
     assert Resque.mongo
     assert_equal 'resque', Resque.mongo.name
@@ -372,5 +372,15 @@ context "Resque" do
     assert_equal(1, Resque.size(:hydra39))
     Resque.enqueue(UniqueHydraJob, {:_id => '518', :one => 'one'})
     assert_equal(2, Resque.size(:hydra39))
+  end
+
+  test "inlining jobs" do
+    begin
+      Resque.inline = true
+      Resque.enqueue(SomeIvarJob, 20, '/tmp')
+      assert_equal 0, Resque.size(:ivar)
+    ensure
+      Resque.inline = false
+    end
   end
 end

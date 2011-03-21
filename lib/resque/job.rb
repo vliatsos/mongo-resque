@@ -75,10 +75,16 @@ module Resque
         end
       end
       
-      ret = Resque.push(queue, item)
+      if Resque.inline?
+        ret = constantize(klass).perform(*decode(encode(args)))
+      else
+        ret = Resque.push(queue, item)
+      end
+
       Plugin.after_enqueue_hooks(klass).each do |hook|
         klass.send(hook, *args)
       end
+
       ret
     end
 
