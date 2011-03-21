@@ -294,6 +294,10 @@ module Resque
       klass.send(:perform, *args)
     else
       Job.create(queue_from_class(klass), klass, *args)
+      
+      Plugin.after_enqueue_hooks(klass).each do |hook|
+        klass.send(hook, *args)
+      end
     end
   end
 

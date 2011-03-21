@@ -76,16 +76,10 @@ module Resque
       end
       
       if Resque.inline?
-        ret = constantize(klass).perform(*decode(encode(args)))
+        constantize(klass).perform(*decode(encode(args)))
       else
-        ret = Resque.push(queue, item)
+        Resque.push(queue, item)
       end
-
-      Plugin.after_enqueue_hooks(klass).each do |hook|
-        klass.send(hook, *args)
-      end
-
-      ret
     end
 
     # Removes a job from a queue. Expects a string queue name, a
