@@ -124,17 +124,6 @@ class NonDelayedJob
   @queue = :delayed
 end
 
-class HydraJob
-  @queue = :hydra
-  @hydra = 2
-end
-
-class UniqueHydraJob
-  @queue = :hydra
-  @unique_jobs = true
-  @hydra = 100
-end
-
 class BadFailureBackend < Resque::Failure::Base
   def save
     raise Exception.new("Failure backend error")

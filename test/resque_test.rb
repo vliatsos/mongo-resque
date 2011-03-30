@@ -332,26 +332,6 @@ context "Resque" do
     end
   end
 
-  test "hydra works" do
-    20.times do
-      Resque.enqueue(HydraJob, { :one => 'one'})
-    end
-    assert_equal(0, Resque.size(:hydra))
-    assert_equal(20, Resque.size(:hydra1)+Resque.size(:hydra0))
-    assert(0 != Resque.size(:hydra1))
-    assert(0 != Resque.size(:hydra0))
-  end
-
-  test "hydra/unique hashes correctly" do
-    20.times do
-      Resque.enqueue(UniqueHydraJob, {:_id => 'zomgz', :one => 'one'})
-    end
-    # 'zomgz'.hash % 100 == 39
-    assert_equal(1, Resque.size(:hydra39))
-    Resque.enqueue(UniqueHydraJob, {:_id => '518', :one => 'one'})
-    assert_equal(2, Resque.size(:hydra39))
-  end
-
   test "inlining jobs" do
     begin
       Resque.inline = true

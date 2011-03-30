@@ -65,16 +65,6 @@ module Resque
         end
       end
 
-      #is it a hydra job?
-      heads = klass.instance_variable_get(:@hydra)
-      if heads
-        if item[:_id]
-          queue = (queue.to_s + (item[:_id].hash % heads).to_s).to_sym 
-        else
-          queue = (queue.to_s + rand(heads).to_s).to_sym     
-        end
-      end
-      
       if Resque.inline?
         constantize(klass).perform(*decode(encode(args)))
       else
