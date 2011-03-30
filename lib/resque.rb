@@ -23,8 +23,6 @@ require 'resque/plugin'
 module Resque
   include Helpers
   extend self
-  attr_accessor :bypass_queues
-  @bypass_queues = false
   @delay_allowed = []
   
   
@@ -290,14 +288,10 @@ module Resque
   #
   # This method is considered part of the `stable` API.
   def enqueue(klass, *args)
-    if @bypass_queues
-      klass.send(:perform, *args)
-    else
-      Job.create(queue_from_class(klass), klass, *args)
-      
-      Plugin.after_enqueue_hooks(klass).each do |hook|
-        klass.send(hook, *args)
-      end
+    Job.create(queue_from_class(klass), klass, *args)
+    
+    Plugin.after_enqueue_hooks(klass).each do |hook|
+      klass.send(hook, *args)
     end
   end
 

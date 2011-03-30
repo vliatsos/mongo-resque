@@ -3,7 +3,6 @@ require 'test_helper'
 context "Resque" do
   setup do
     Resque.drop
-    Resque.bypass_queues = false
     Resque.enable_delay(:delayed)
     Resque.push(:people, { 'name' => 'chris' })
     Resque.push(:people, { 'name' => 'bob' })
@@ -291,17 +290,6 @@ context "Resque" do
     assert_equal('my args4',  Resque.peek(:unique, 5)['args'][0]['arg1'])
   end
 
-  test "Can bypass queues for testing" do
-    Resque.enqueue(NonUnique, 'test')
-    assert_equal(1, Resque.size(:unique))
-    Resque.bypass_queues = true
-    Resque.enqueue(NonUnique, 'test')
-    assert_equal(1, Resque.size(:unique))
-    Resque.bypass_queues = false
-    Resque.enqueue(NonUnique, 'test')
-    assert_equal(2, Resque.size(:unique))    
-  end
-
   test "delayed jobs work" do
     args = { :delay_until => Time.new-1}
     Resque.enqueue(DelayedJob, args)
@@ -328,16 +316,6 @@ context "Resque" do
     args[:delay_until] = Time.new - 1
     Resque.enqueue(DelayedJob, args)
     assert_equal(2, Resque::Job.reserve(:delayed).args[0].keys.count)
-  end
-
-  test "delayed attribute is ignored when bypassing queues" do
-    Resque.bypass_queues = true
-    args = { :delay_until => Time.new+20}
-    foo =  Resque.enqueue(DelayedJob, args)
-    assert_equal(0, Resque.size(:delayed))
-    assert(args[:delay_until] > Time.new)
-    assert(foo =~ /^delayed job executing/)
-    Resque.bypass_queues = false
   end
 
   test "mixing delay and non-delay is bad" do
