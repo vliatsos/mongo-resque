@@ -135,7 +135,7 @@ module Resque
   end
 
   def to_s
-    connection_info = Mongo::VERSION >= "1.1.3" ? mongo.connection.primary_pool : mongo.connection
+    connection_info = mongo.connection.primary_pool
     "Resque Client connected to #{connection_info.host}:#{connection_info.port}/#{mongo.name}"
   end
 
