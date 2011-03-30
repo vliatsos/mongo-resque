@@ -139,11 +139,6 @@ module Resque
     "Resque Client connected to #{connection_info.host}:#{connection_info.port}/#{mongo.name}"
   end
 
-  def allows_unique_jobs(klass)
-    klass.instance_variable_get(:@unique_jobs) ||
-      (klass.respond_to?(:unique_jobs) and klass.unique_jobs)
-  end
-
   def allows_delayed_jobs(klass)
     klass.instance_variable_get(:@delayed_jobs) ||
       (klass.respond_to?(:delayed_jobs) and klass.delayed_jobs)
@@ -180,11 +175,7 @@ module Resque
   # item should be any JSON-able Ruby object.
   def push(queue, item)
     item[:resque_enqueue_timestamp] = Time.now
-    if item[:unique]
-      mongo[queue].update({'_id' => item[:_id]}, item, { :upsert => true})
-    else
-      mongo[queue] << item
-    end
+    mongo[queue] << item
   end
 
   # Pops a job off a queue. Queue name should be a string.

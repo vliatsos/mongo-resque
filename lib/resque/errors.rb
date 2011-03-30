@@ -8,6 +8,6 @@ module Resque
   # Raised when a worker was killed while processing a job.
   class DirtyExit < RuntimeError; end
 
-  #raised for bad delay/unique queue integrity
+  #raised for bad delay queue integrity
   class QueueError < RuntimeError; end
 end

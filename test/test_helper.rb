@@ -85,28 +85,9 @@ class BadJobWithSyntaxError
   end
 end
 
-class UniqueJob
-  @queue = :unique
-  @unique_jobs = true
-end
-
-class NonUnique
-  @queue = :unique
-
-  def self.perform(data)
-    "I has a #{data}"
-  end
-end
-
-class OtherUnique
-  @queue = :unique2
-  @unique_jobs = true
-end
-
 class DelayedJob
   @queue = :delayed
   @delayed_jobs = true
-  @unique_jobs = true
   def self.perform(data)
     "delayed job executing #{data.inspect}"
   end

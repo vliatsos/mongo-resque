@@ -44,10 +44,7 @@ module Resque
       Resque.validate(klass, queue)
 
       item = { :class => klass.to_s, :args => args}
-            
-      item[:_id] = args[0][:_id] if Resque.allows_unique_jobs(klass) && args[0].is_a?(Hash) && args[0].has_key?(:_id)
-      item[:unique] = true if item[:_id]
-      
+
       #are we trying to put a non-delayed job into a delayed queue?
       if Resque.queue_allows_delayed(queue)
         if Resque.allows_delayed_jobs(klass)
