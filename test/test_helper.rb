@@ -11,11 +11,6 @@ begin
 rescue LoadError
 end
 
-#
-# start our own redis when the tests start,
-# kill it when they end
-#
-
 ##
 # test/spec/mini 3
 # http://gist.github.com/25455
