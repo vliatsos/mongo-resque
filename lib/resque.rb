@@ -145,12 +145,14 @@ module Resque
   end
 
   def queue_allows_delayed(queue)
+    queue = namespace_queue(queue)
     @delay_allowed.include?(queue.to_sym) || @delay_allowed.include?(queue.to_s)
   end
 
   def enable_delay(queue)
+    queue = namespace_queue(queue)
     unless queue_allows_delayed queue
-      @delay_allowed << queue 
+      @delay_allowed << queue
       mongo_stats.update({:stat => 'Delayable Queues'}, { '$addToSet' => { 'value' => queue}}, { :upsert => true})
     end
   end
@@ -174,6 +176,7 @@ module Resque
   # Pushes a job onto a queue. Queue name should be a string and the
   # item should be any JSON-able Ruby object.
   def push(queue, item)
+    queue = namespace_queue(queue)
     item[:resque_enqueue_timestamp] = Time.now
     mongo[queue] << item
   end
@@ -182,7 +185,8 @@ module Resque
   #
   # Returns a Ruby object.
   def pop(queue)
-    query = { }
+    queue = namespace_queue(queue)
+    query = {}
     if queue_allows_delayed queue
       query['delay_until'] = { '$not' => { '$gt' => Time.new}}
     end
@@ -195,11 +199,13 @@ module Resque
 
   # Returns an integer representing the size of a queue.
   # Queue name should be a string.
-  def size(queue) 
+  def size(queue)
+    queue = namespace_queue(queue)
     mongo[queue].count
   end
 
   def delayed_size(queue)
+    queue = namespace_queue(queue)
     if queue_allows_delayed queue
       mongo[queue].find({'delay_until' => { '$gt' => Time.new}}).count
     else
@@ -208,6 +214,7 @@ module Resque
   end
 
   def ready_size(queue)
+    queue = namespace_queue(queue)
     if queue_allows_delayed queue
       mongo[queue].find({'delay_until' =>  { '$not' => { '$gt' => Time.new}}}).count
     else
@@ -246,18 +253,27 @@ module Resque
         sort << ['delay_until', 1]
       end
     end
-    items = mongo[key].find(query, { :limit => count, :skip => start, :sort => sort}).to_a.map{ |i| i}
+    queue = namespace_queue(key)
+    items = mongo[queue].find(query, { :limit => count, :skip => start, :sort => sort}).to_a.map{ |i| i}
     count > 1 ? items : items.first
   end
 
   # Returns an array of all known Resque queues as strings.
-  def queues    
-    names = mongo.collection_names
-    names.delete_if{ |name| name =~ /system./ || name =~ /resque\./ }  
+  def queues        
+    mongo.collection_names.
+      select { |name| name =~ /resque\.queues\./ }.
+      collect { |name| name.split(".")[2..-1].join('.') }
+  end
+
+  # Returns the mongo collection for a given queue
+  def collection_for_queue(queue)
+    queue = namespace_queue(queue)
+    mongo[queue]
   end
 
   # Given a queue name, completely deletes the queue.
   def remove_queue(queue)
+    queue = namespace_queue(queue)
     mongo[queue].drop
   end
 
@@ -399,5 +415,15 @@ module Resque
   def drop
     mongo.collections.each{ |collection| collection.drop unless collection.name =~ /^system./ }
     @mongo = nil
+  end
+
+  private
+  def namespace_queue(queue)
+    queue = queue.to_s
+    if queue.start_with?('resque.queues.')
+      queue
+    else
+      "resque.queues.#{queue}"
+    end
   end
 end

@@ -13,6 +13,11 @@ Apart from transparently replacing the redis backend with mongodb
 (where each queue has a corresponding mongo collection) this fork
 also features delayed jobs if you want to schedule your jobs.
 
+Note that this fork is different from IGO's fork in that queue
+collections are namespaced with 'resque.queues.' to make it possible
+to use the same database for your application as Resque (this might
+still not be the best idea though - behold the stern warnings below).
+
 Delayed Jobs
 ------------
 
@@ -26,7 +31,7 @@ Stern Warnings
 --------------
 
 Sometimes, Resque-Mongo will drop a queue collection, or create some 
-indexes, or otherwise manipulate its database.  For this reason, it is
+indexes, or otherwise manipulate its database. For this reason, it is
 STRONGLY recommended that you give it its own database in mongo.
 
 All jobs should be queued via Resque.enqueue.  All arguments passed to

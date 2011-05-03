@@ -151,7 +151,6 @@ context "Resque" do
     item
   end
 
-
   test "can pull items off a queue" do
     assert_equal('chris', pop_no_id(:people)['name'])
     assert_equal('bob', pop_no_id(:people)['name']) 
@@ -197,9 +196,21 @@ context "Resque" do
     assert_equal %w( cars people ), Resque.queues.sort
   end
 
+  test "does not confuse normal collections on the same database with queues" do
+    Resque.mongo["some_other_collection"] << {:foo => 'bar'}
+    Resque.push(:cars, { 'make' => 'bmw' })
+    assert_equal %w( cars people ), Resque.queues.sort
+  end
+
   test "queues are always a list" do
     Resque.drop
     assert_equal [], Resque.queues
+  end
+
+  test "can get the collection for a queue" do
+    collection = Resque.collection_for_queue(:people)
+    assert_equal Mongo::Collection, collection.class
+    assert_equal 3, collection.count
   end
 
   test "can delete a queue" do
@@ -211,7 +222,7 @@ context "Resque" do
   end
 
   test "keeps track of resque keys" do
-    assert Resque.keys.include? 'people'
+    assert Resque.keys.include? 'resque.queues.people'
   end
 
   test "badly wants a class name, too" do

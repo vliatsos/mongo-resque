@@ -32,7 +32,6 @@ module Resque
     def initialize(queue, payload)
       @queue = queue
       @payload = payload
-      
     end
 
     # Creates a job by placing it on a queue. Expects a string queue
@@ -94,7 +93,7 @@ module Resque
     # depending on the size of your queue, as it loads all jobs into
     # a Ruby array before processing.
     def self.destroy(queue, klass, *args)
-      collection = Resque.mongo[queue]
+      collection = Resque.collection_for_queue(queue)
       selector = {'class' => klass.to_s}
       selector['args'] = args unless args.empty?
       destroyed = collection.find(selector).count
