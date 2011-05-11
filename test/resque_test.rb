@@ -9,18 +9,17 @@ context "Resque" do
     Resque.push(:people, { 'name' => 'mark' })
   end
 
-  test "can set a namespace through a url-like string" do
-    assert Resque.mongo
-    assert_equal 'resque', Resque.mongo.name
-    Resque.mongo = 'localhost:27017/namespace'
-    assert_equal 'namespace', Resque.mongo.name
+  test "uses database called resque by default" do
+    assert 'resque', Resque.mongo.name
+  end
+
+  test "can set a database with a Mongo::DB" do
+    Resque.mongo = Mongo::Connection.new.db('resque-test-with-specific-database')
+    assert_equal 'resque-test-with-specific-database', Resque.mongo.name
   end
   
-  test "can connect through a mongodb uri" do
-    Resque.mongo.connection.db('authenticated_resque_db').add_user('username', 'password')
-    uri = 'mongodb://username:password@localhost:27017/authenticated_resque_db'
-    Resque.mongo = uri
-    assert_equal 'authenticated_resque_db', Resque.mongo.name
+  test "can not set a database with a uri string" do
+    assert_raise(ArgumentError) { Resque.mongo = 'localhost:27017/namespace' }
   end
 
   test "can put jobs on a queue" do

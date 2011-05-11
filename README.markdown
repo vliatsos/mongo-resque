@@ -27,8 +27,16 @@ Time indicated in arg[0][:delay_until] has come.  Note that you must
 call Resque.enable_delay(:queue) before enququing any delayed jobs, to
 ensure that the performance impact on other queues is minimal.
 
+Configuration
+=============
+
+Resque.redis= has been replaced with Resque.mongo= and expects a Mongo::DB
+object as an argument.
+
+    Resque.mongo = Mongo::Connection.new.db("my_awesome_queue")
+
 Stern Warnings
---------------
+==============
 
 Sometimes, Resque-Mongo will drop a queue collection, or create some 
 indexes, or otherwise manipulate its database. For this reason, it is

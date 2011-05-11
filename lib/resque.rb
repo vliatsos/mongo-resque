@@ -25,39 +25,22 @@ module Resque
   extend self
   @delay_allowed = []
   
-  
-  def mongo=(server)
-    if server.is_a?(String) && server.start_with?('mongodb://')
-      conn = Mongo::Connection.from_uri(server)
-      queuedb = Mongo::URIParser.new(server).auths.first['db_name']
-    elsif server.is_a? String
-      opts = server.split(':')
-      host = opts[0]
-      if opts[1] =~ /\//
-        opts = opts[1].split('/')
-        port = opts[0]
-        queuedb = opts[1]
-      else
-        port = opts[1]
-      end
-      conn = Mongo::Connection.new host, port
-    elsif server.is_a? Hash
-      conn = Mongo::Connection.new(server[:server], server[:port], server)
-      queuedb = server[:queuedb] || 'resque'
-    elsif server.is_a? Mongo::Connection
-      conn = server
+  # Set the queue database. Expects a Mongo::DB object.
+  def mongo=(database)
+    if database.is_a?(Mongo::DB)
+      @mongo = database
+      initialize_mongo
+    else
+      raise ArgumentError, "Resque.mongo= expects a Mongo::DB database, not a #{database.class}."
     end
-    queuedb ||= 'resque'
-    @mongo = conn.db queuedb    
-    initialize_mongo
   end
 
-  # Returns the current Mongo connection. If none has been created, will
-  # create a new one.
+  # Returns the current Mongo::DB. If none has been created, it will
+  # create a new one called 'resque'.
   def mongo
     return @mongo if @mongo
-    self.mongo = 'localhost:27017/resque'
-    self.mongo
+    self.mongo = Mongo::Connection.new.db("resque")
+    @mongo
   end
 
   def mongo_db=(db)
