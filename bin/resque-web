@@ -18,6 +18,6 @@ Vegas::Runner.new(Resque::Server, 'resque-web', {
 }) do |runner, opts, app|
   opts.on('-N NAMESPACE', "--namespace NAMESPACE", "set the Mongo database") {|namespace|
     runner.logger.info "Using Mongo database '#{namespace}'"
-    Resque.mongo_db= namespace
+    Resque.mongo = Resque.mongo.conn.db(namespace)
   }
 end

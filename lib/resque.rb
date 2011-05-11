@@ -43,14 +43,6 @@ module Resque
     @mongo
   end
 
-  def mongo_db=(db)
-      mongo.conn.db = db
-  end
-
-  def mongo?
-    return @mongo
-  end
-
   def initialize_mongo
     mongo_workers.create_index :worker
     mongo_stats.create_index :stat
