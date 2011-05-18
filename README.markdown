@@ -18,6 +18,10 @@ collections are namespaced with 'resque.queues.' to make it possible
 to use the same database for your application as Resque (this might
 still not be the best idea though - behold the stern warnings below).
 
+Original resque is currently using hoptoad_notifier in its Hoptoad Failure
+Backend. This fork has not implemented this change as I'm undecided wether 
+the change was for the better or not (we avoid dependency troubles this way).
+
 Delayed Jobs
 ------------
 

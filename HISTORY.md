@@ -1,3 +1,22 @@
+## 1.16.1 (2011-05-18)
+
+Exlusive to resque-mongo:
+* BREAKING CHANGE! Resque.mongo now expects a Mongo::DB object and nothing else
+* Minor api cleanups (removed undocumented methods to get closer to original resque)
+* Did NOT make the switch to use hoptoad_notifier for the hoptoad failure backend
+
+From original resque:
+* Added `Worker#paused?` method
+* Bugfix: Properly reseed random number generator after forking.
+* Bugfix: Monit example stdout/stderr redirection
+* Bugfix: Removing single failure now works with multiple failure backends
+* Web: 'Remove Queue' now requires confirmation
+* Web: Favicon!
+* Web Bugfix: Dates display in Safari
+* Web Bugfix: Dates display timezone
+* Web Bugfix: Race condition querying working workers
+* Web Bugfix: Fix polling /workers/all in resque-web
+
 ## 1.15.0 (2011-03-18)
 
 * Fixed Sinatra 1.2 compatibility
