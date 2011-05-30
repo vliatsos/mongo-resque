@@ -1,3 +1,8 @@
+## 1.17.1 (2011-05-30)
+
+* More monit typo fixes
+* Web UI: Wrap preformatted arguments
+
 ## 1.16.1 (2011-05-18)
 
 Exlusive to resque-mongo:
