@@ -16,10 +16,10 @@ Gem::Specification.new do |s|
     without the work of defunkt and ctrochalakis on github.
 description
 
+  s.add_dependency "mongo",      "~> 1.3.0"
   s.add_dependency "vegas",      "~> 0.1.2"
   s.add_dependency "sinatra",    ">= 0.9.2"
-  s.add_dependency "json",       ">= 1.4.6", "< 1.6.0"
-  s.add_dependency "mongo",      "~> 1.3.0"
+  s.add_dependency "multi_json", "~> 1.0"
   
   s.files = Dir["lib/**/*"] + Dir["bin/*"] + Dir["docs/*"] + %w(README.markdown LICENSE HISTORY.md)
   s.executables = %w(resque resque-web)

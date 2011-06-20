@@ -1,10 +1,3 @@
-
-begin
-  require 'yajl'
-rescue LoadError
-  require 'json'
-end
-
 require 'mongo'
 
 require 'resque/version'
