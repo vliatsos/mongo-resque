@@ -3,6 +3,10 @@ Mongo-Resque
 
 Mongo-Resque is a fork of Resque based on MongoDB instead of Redis.
 
+All work on this project is sponsored by the online video platform [Streamio](http://streamio.com).
+
+[![Streamio](http://d253c4ja9jigvu.cloudfront.net/assets/small-logo.png)](http://streamio.com)
+
 Check out the [ORIGINAL_README][0] included in this repository
 for the general Resque lowdown.
 
