@@ -65,15 +65,14 @@ end
 # Publishing
 #
 
-desc "Push a new version to Gemcutter"
+desc "Push a new version to Rubygems"
 task :publish do
   require 'resque/version'
 
-  sh "gem build resque.gemspec"
-  sh "gem push resque-#{Resque::Version}.gem"
+  sh "gem build mongo-resque.gemspec"
+  sh "gem push mongo-resque-#{Resque::Version}.gem"
   sh "git tag v#{Resque::Version}"
   sh "git push origin v#{Resque::Version}"
   sh "git push origin master"
-  sh "git clean -fd"
-  exec "rake pages"
+  sh "rm mongo-resque*.gem"
 end
