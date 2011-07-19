@@ -1,7 +1,7 @@
-Resque-Mongo
+Mongo-Resque
 ============
 
-Resque-Mongo is a fork of Resque based on MongoDB instead of Redis.
+Mongo-Resque is a fork of Resque based on MongoDB instead of Redis.
 
 Check out the [ORIGINAL_README][0] included in this repository
 for the general Resque lowdown.
@@ -42,12 +42,12 @@ object as an argument.
 Stern Warnings
 ==============
 
-Sometimes, Resque-Mongo will drop a queue collection, or create some 
+Sometimes, Mongo-Resque will drop a queue collection, or create some
 indexes, or otherwise manipulate its database. For this reason, it is
 STRONGLY recommended that you give it its own database in mongo.
 
 All jobs should be queued via Resque.enqueue.  All arguments passed to
-this method must be BSON-encodable.  Resque-Mongo does not serialize
+this method must be BSON-encodable. Mongo-Resque does not serialize
 your objects for you.  Arrays, Hashes, Strings, Numbers, and Times
 are all ok, so don't worry.
 
@@ -56,7 +56,7 @@ your perform method to be an options hash.  In fact, if you just start
 making all your perform()s take one param, that is an options hash,
 you'll probably save yourself some pain.
 
-Resque-Mongo will not create any indexes on your queues, only on its
+Mongo-Resque will not create any indexes on your queues, only on its
 meta-data.  You will need to create any indexes you want.  Normally,
 This is not a problem, because you aren't querying by keys, but you may
 want to create indexes on the class key in some circumstances.  If you 
