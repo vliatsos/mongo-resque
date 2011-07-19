@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.version     = Resque::Version
   s.authors     = ["David Backeus"]
   s.email       = ["david@streamio.se"]
-  s.homepage    = "http://github.com/dbackeus/mongo-resque"
+  s.homepage    = "https://github.com/streamio/mongo-resque"
   s.summary     = "Mongo-Resque is a mongo-backed queueing system"
   s.description = <<-description
     Resque is a Redis-backed Ruby library for creating background jobs,
