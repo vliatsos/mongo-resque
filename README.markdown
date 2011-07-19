@@ -35,6 +35,13 @@ Time indicated in arg[0][:delay_until] has come.  Note that you must
 call Resque.enable_delay(:queue) before enququing any delayed jobs, to
 ensure that the performance impact on other queues is minimal.
 
+Bundling
+========
+
+Make sure you use the right require in your Gemfile.
+
+    gem 'mongo-resque', :require => 'resque'
+
 Configuration
 =============
 
