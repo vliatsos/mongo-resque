@@ -40,7 +40,9 @@ Bundling
 
 Make sure you use the right require in your Gemfile.
 
-    gem 'mongo-resque', :require => 'resque'
+``` ruby
+gem 'mongo-resque', :require => 'resque'
+```
 
 Configuration
 =============
@@ -48,7 +50,9 @@ Configuration
 Resque.redis= has been replaced with Resque.mongo= and expects a Mongo::DB
 object as an argument.
 
-    Resque.mongo = Mongo::Connection.new.db("my_awesome_queue")
+``` ruby
+Resque.mongo = Mongo::Connection.new.db("my_awesome_queue")
+```
 
 Stern Warnings
 ==============
