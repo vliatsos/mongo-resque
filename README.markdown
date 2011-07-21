@@ -29,7 +29,7 @@ the change was for the better or not (we avoid dependency troubles this way).
 Delayed Jobs
 ------------
 
-If your job class indicates that @delayed_jobs = true, you can queue
+If your job class indicates that @delayed = true, you can queue
 delayed jobs.  These jobs will not be popped off the queue until the
 Time indicated in arg[0][:delay_until] has come.  Note that you must
 call Resque.enable_delay(:queue) before enququing any delayed jobs, to

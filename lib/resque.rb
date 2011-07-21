@@ -23,7 +23,7 @@ require 'resque/plugin'
 module Resque
   include Helpers
   extend self
-  @delay_allowed = []
+  @delayed_queues = []
   
   # Set the queue database. Expects a Mongo::DB object.
   def mongo=(database)
@@ -46,8 +46,8 @@ module Resque
   def initialize_mongo
     mongo_workers.create_index :worker
     mongo_stats.create_index :stat
-    delay_allowed = mongo_stats.find_one({ :stat => 'Delayable Queues'}, { :fields => ['value']})
-    @delay_allowed = delay_allowed['value'].map{ |queue| queue.to_sym} if delay_allowed    
+    delayed_queues = mongo_stats.find_one(:stat => 'Delayed Queues')
+    @delayed_queues = delayed_queues['value'] if delayed_queues
   end
 
   def mongo_workers
@@ -114,21 +114,20 @@ module Resque
     "Resque Client connected to #{connection_info.host}:#{connection_info.port}/#{mongo.name}"
   end
 
-  def allows_delayed_jobs(klass)
-    klass.instance_variable_get(:@delayed_jobs) ||
-      (klass.respond_to?(:delayed_jobs) and klass.delayed_jobs)
+  def delayed_job?(klass)
+    klass.instance_variable_get(:@delayed) ||
+      (klass.respond_to?(:delayed) and klass.delayed)
   end
 
-  def queue_allows_delayed(queue)
-    queue = namespace_queue(queue)
-    @delay_allowed.include?(queue.to_sym) || @delay_allowed.include?(queue.to_s)
+  def delayed_queue?(queue)
+    @delayed_queues.include? namespace_queue(queue)
   end
 
   def enable_delay(queue)
     queue = namespace_queue(queue)
-    unless queue_allows_delayed queue
-      @delay_allowed << queue
-      mongo_stats.update({:stat => 'Delayable Queues'}, { '$addToSet' => { 'value' => queue}}, { :upsert => true})
+    unless delayed_queue? queue
+      @delayed_queues << queue
+      mongo_stats.update({:stat => 'Delayed Queues'}, {'$addToSet' => {'value' => queue}}, {:upsert => true})
     end
   end
   
@@ -175,11 +174,9 @@ module Resque
   def pop(queue)
     queue = namespace_queue(queue)
     query = {}
-    if queue_allows_delayed queue
-      query['delay_until'] = { '$not' => { '$gt' => Time.new}}
-    end
+    query['delay_until'] = { '$lt' => Time.now } if delayed_queue?(queue)
     #sorting will result in significant performance penalties for large queues, you have been warned.
-    item = mongo[queue].find_and_modify(:query => query, :remove => true, :sort => [[:_id, :asc]] )
+    item = mongo[queue].find_and_modify(:query => query, :remove => true, :sort => [[:_id, :asc]])
   rescue Mongo::OperationFailure => e
     return nil if e.message =~ /No matching object/
     raise e
@@ -194,8 +191,8 @@ module Resque
 
   def delayed_size(queue)
     queue = namespace_queue(queue)
-    if queue_allows_delayed queue
-      mongo[queue].find({'delay_until' => { '$gt' => Time.new}}).count
+    if delayed_queue? queue
+      mongo[queue].find({'delay_until' => { '$gt' => Time.now }}).count
     else
       mongo[queue].count
     end
@@ -203,8 +200,8 @@ module Resque
 
   def ready_size(queue)
     queue = namespace_queue(queue)
-    if queue_allows_delayed queue
-      mongo[queue].find({'delay_until' =>  { '$not' => { '$gt' => Time.new}}}).count
+    if delayed_queue? queue
+      mongo[queue].find({'delay_until' => { '$lt' => Time.now }}).count
     else
       mongo[queue].count
     end
@@ -228,7 +225,7 @@ module Resque
   def list_range(key, start = 0, count = 1, mode = :ready)
     query = { }
     sort = []
-    if queue_allows_delayed(key)
+    if delayed_queue? key
       if mode == :ready
         query['delay_until'] = { '$not' => { '$gt' => Time.new}}
       elsif mode == :delayed
@@ -288,6 +285,10 @@ module Resque
     Plugin.after_enqueue_hooks(klass).each do |hook|
       klass.send(hook, *args)
     end
+  end
+  
+  def enqueue_delayed(klass, *args)
+    
   end
 
   # This method can be used to conveniently remove a job from a queue.

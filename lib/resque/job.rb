@@ -45,8 +45,8 @@ module Resque
       item = { :class => klass.to_s, :args => args}
 
       #are we trying to put a non-delayed job into a delayed queue?
-      if Resque.queue_allows_delayed(queue)
-        if Resque.allows_delayed_jobs(klass)
+      if Resque.delayed_queue?(queue)
+        if Resque.delayed_job?(klass)
           if args[0].is_a?(Hash) && args[0].has_key?(:delay_until)
             item[:delay_until] = args[0][:delay_until]
           else
@@ -56,7 +56,7 @@ module Resque
           raise QueueError.new 'trying to insert non-delayed job into delayed queue'
         end
       else
-        if Resque.allows_delayed_jobs(klass)
+        if Resque.delayed_job?(klass)
           raise QueueError.new 'trying to insert a delayed job into a non-delayed queue'
         end
       end
