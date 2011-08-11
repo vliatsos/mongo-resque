@@ -367,10 +367,9 @@ module Resque
     # what workers are doing and when.
     def working_on(job)
       job.worker = self
-      data = #encode \
-        { :queue   => job.queue,
-        :run_at  => Time.now.to_s,
-        :payload => job.payload}
+      data = { :queue   => job.queue,
+               :run_at  => Time.now.strftime("%Y/%m/%d %H:%M:%S"),
+               :payload => job.payload }
       mongo_workers.update({:worker => self.to_s}, { '$set' => { 'working_on' => data}}, :upsert => true)
     end
 
