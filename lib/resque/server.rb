@@ -100,8 +100,8 @@ module Resque
       response["Cache-Control"] = "max-age=0, private, must-revalidate"
       begin
         erb page.to_sym, {:layout => layout}, :resque => Resque
-      rescue Errno::ECONNREFUSED
-        erb :error, {:layout => false}, :error => "Can't connect to Redis! (#{Resque.redis_id})"
+      rescue Mongo::ConnectionError, Mongo::ConnectionFailure
+        erb :error, {:layout => false}, :error => "Can't connect to MongoDB!"
       end
     end
 
