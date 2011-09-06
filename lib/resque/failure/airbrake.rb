@@ -4,13 +4,13 @@ require 'uri'
 
 module Resque
   module Failure
-    # A Failure backend that sends exceptions raised by jobs to Hoptoad.
+    # A Failure backend that sends exceptions raised by jobs to Airbrake.
     #
     # To use it, put this code in an initializer, Rake task, or wherever:
     #
-    #   require 'resque/failure/hoptoad'
+    #   require 'resque/failure/airbrake'
     #
-    #   Resque::Failure::Hoptoad.configure do |config|
+    #   Resque::Failure::Airbrake.configure do |config|
     #     config.api_key = 'blah'
     #     config.secure = true
     #
@@ -21,8 +21,8 @@ module Resque
     #     # server env support, defaults to RAILS_ENV or RACK_ENV
     #     config.server_environment = "test"
     #   end
-    class Hoptoad < Base
-      # From the hoptoad plugin
+    class Airbrake < Base
+      # From the airbrake plugin
       INPUT_FORMAT = /^([^:]+):(\d+)(?::in `([^']+)')?$/
 
       class << self
@@ -31,7 +31,7 @@ module Resque
       end
 
       def self.count
-        # We can't get the total # of errors from Hoptoad so we fake it
+        # We can't get the total # of errors from Airbrake so we fake it
         # by asking Resque how many errors it has seen.
         Stat[:failed]
       end
@@ -43,7 +43,7 @@ module Resque
 
       def save
         http = use_ssl? ? :https : :http
-        url = URI.parse("#{http}://hoptoadapp.com/notifier_api/v2/notices")
+        url = URI.parse("#{http}://airbrakeapp.com/notifier_api/v2/notices")
 
         request = Net::HTTP::Proxy(self.class.proxy_host, self.class.proxy_port)
         http = request.new(url.host, url.port)
@@ -60,15 +60,15 @@ module Resque
         begin
           response = http.post(url.path, xml, headers)
         rescue TimeoutError => e
-          log "Timeout while contacting the Hoptoad server."
+          log "Timeout while contacting the Airbrake server."
         end
 
         case response
         when Net::HTTPSuccess then
-          log "Hoptoad Success: #{response.class}"
+          log "Airbrake Success: #{response.class}"
         else
           body = response.body if response.respond_to? :body
-          log "Hoptoad Failure: #{response.class}\n#{body}"
+          log "Airbrake Failure: #{response.class}\n#{body}"
         end
       end
 
@@ -78,7 +78,7 @@ module Resque
         x.notice :version=>"2.0" do
           x.tag! "api-key", api_key
           x.notifier do
-            x.name "Resqueue"
+            x.name "Resque"
             x.version "0.1"
             x.url "http://github.com/defunkt/resque"
           end
