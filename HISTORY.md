@@ -1,3 +1,7 @@
+## 1.19.1 (2011-10-07)
+
+* Change mongo gem dependency to include all 1.x versions from 1.3
+
 ## 1.19.0 (2011-09-06)
 
 * Changed Hoptoad failure backend into Airbrake (not backwards compatible!)
