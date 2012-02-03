@@ -467,8 +467,28 @@ module Resque
     def worker_pids
       if RUBY_PLATFORM =~ /solaris/
         solaris_worker_pids
+      elsif ENV['OS'] =~ /Windows/
+        windows_worker_pids
       else
         linux_worker_pids
+      end
+    end
+
+    # Find Resque worker pids on Windows.
+    #
+    # Returns an Array of string pids of all the other workers on this
+    # machine. Useful when pruning dead workers on startup.
+    def windows_worker_pids
+      command = "TASKLIST /FO CSV /NH"    
+      if RUBY_PLATFORM == 'java'
+        # Look for java process
+        name = 'java.exe'
+      else
+        # Look for ruby process
+        name = 'ruby.exe'
+      end
+      IO.popen(command) do |f|
+        f.readlines.grep(/#{name}/).map { |line| line.split(",")[1].gsub!(/^"(.*?)"$/,'\1').to_i }
       end
     end
 
