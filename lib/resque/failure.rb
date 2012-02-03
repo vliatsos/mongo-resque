@@ -49,6 +49,10 @@ module Resque
       backend.all(start, count)
     end
 
+    def self.queue(queue, start = 0, count = 1)
+      backend.queue(queue, start, count)
+    end
+
     # The string url of the backend's web interface, if any.
     def self.url
       backend.url
@@ -63,8 +67,24 @@ module Resque
       backend.requeue(index)
     end
 
+    def self.requeue_queue(queue)
+      backend.requeue_queue(queue)
+    end
+
+    def self.requeue_queue_index(queue, index)
+      backend.requeue_queue_index(queue, index)
+    end
+
     def self.remove(index)
       backend.remove(index)
+    end
+
+    def self.remove_queue(queue)
+      backend.remove_queue(queue)
+    end
+
+    def self.remove_queue_index(queue, index)
+      backend.remove_queue_index(queue, index)
     end
   end
 end

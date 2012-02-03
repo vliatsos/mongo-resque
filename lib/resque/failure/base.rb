@@ -41,6 +41,10 @@ module Resque
         []
       end
 
+      def self.queue(queue, start = 0, count = 1)
+        []
+      end
+
       # A URL where someone can go to view failures.
       def self.url
       end
@@ -52,7 +56,19 @@ module Resque
       def self.requeue(index)
       end
 
+      def self.requeue_queue(queue)
+      end
+
+      def self.requeue_queue_index(queue, index)
+      end
+
       def self.remove(index)
+      end
+
+      def self.remove_queue(queue)
+      end
+
+      def self.remove_queue_index(queue, index)
       end
 
       # Logging!

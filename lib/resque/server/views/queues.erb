@@ -52,12 +52,14 @@
       <th>Name</th>
       <th>Ready Jobs</th>
       <th>Delayed Jobs</th>
+      <th>Failed Jobs</th>
     </tr>
     <% for queue in resque.queues.sort_by { |q| q.to_s } %>
     <tr>
       <td class='queue'><a class="queue" href="<%= u "queues/#{queue}" %>"><%= queue %></a></td>
       <td class='size'><%= resque.ready_size queue.to_sym %></td>
       <td class='size'><%= resque.delayed_size(queue.to_sym) if resque.delayed_queue?(queue) %></td>
+      <td class='size'><a href="<%= u "failed/#{queue}" %>"><%= resque.mongo_failures.find({'queue' => queue}).count %></a></td>
     </tr>
     <% end %>
     <tr class="<%= Resque::Failure.count.zero? ? "failed" : "failure" %>">
